@@ -14,6 +14,8 @@ Repo for Apollo Engineering Coding Exercise on Vehicle API
 
 ## Run
 
+```uvicorn main:app --reload```
+
 ## Test
 
 ## File Structure
