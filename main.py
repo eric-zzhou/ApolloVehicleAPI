@@ -31,7 +31,7 @@ def get_vehicles(db: db_dep):
     return db.query(models.Vehicle).all()
 
 
-@app.post("/vehicle")
+@app.post("/vehicle", status_code=201)
 def post_vehicle(vehicle: VehicleBase, db: db_dep):
     new_vehicle = models.Vehicle(
         vin=vehicle.vin,

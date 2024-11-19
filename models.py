@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Integer, DECIMAL
+from sqlalchemy.dialects.postgresql import CITEXT
 from database import Base
 
 
@@ -6,10 +7,11 @@ class Vehicle(Base):
     __tablename__ = "vehicles"
 
     vin = Column(  # VIN
-        String,
-        case_sensitive=False,
+        CITEXT,
         primary_key=True,
         index=True,
+        unique=True,
+        nullable=False,
     )
     man = Column(String)  # Manufacturer name
     desc = Column(String)  # Description
