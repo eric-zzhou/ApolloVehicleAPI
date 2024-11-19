@@ -18,6 +18,8 @@ db_dep = Annotated[Session, Depends(get_db)]
 # Exception Handlers
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    print("ERRORRRRR")
+    print(exc.errors())
     return JSONResponse(
         status_code=422,
         content={"detail": exc.errors(), "body": exc.body},
