@@ -53,7 +53,7 @@ def test_create_invalid_vehicle():
             # Missing fuel_type
         },
     )
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert "fuel_type" in response.json()["errors"][0]["loc"]
 
 

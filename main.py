@@ -13,7 +13,13 @@ Base.metadata.create_all(bind=engine)
 
 
 db_dep = Annotated[Session, Depends(get_db)]
-format_errs = {"string_type", "string_too_short", "greater_than", "int_parsing"}
+format_errs = {
+    "string_type",
+    "string_too_short",
+    "greater_than",
+    "int_parsing",
+    "missing",
+}
 
 
 # Exception Handlers

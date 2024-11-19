@@ -19,6 +19,7 @@ Repo for Apollo Engineering Coding Exercise on Vehicle API
 ## Test
 
 ```./run_tests.sh```
+Note: this currently resets the database
 
 ## File Structure
 ```
