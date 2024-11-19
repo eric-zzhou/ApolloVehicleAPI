@@ -18,28 +18,42 @@ Repo for Apollo Engineering Coding Exercise on Vehicle API
 
 ## Test
 
+```./run_tests.sh```
+
 ## File Structure
 ```
 ApolloVehicleAPI
+├── env (folder)
+├── .env
+├── .env.example
+├── .gitignore
+├── create_db.sh
+├── database.py
+├── main.py
+├── models.py
 ├── README.md
-├── setup.sh
-├── env
 ├── requirements.txt
-|── database.py
-|── models.py
-|── main.py
-|── test_main.py
+├── reset_db.sh
+├── run_tests.sh
+├── setup.sh
+|── test_vehicles.py
 ```
-```setup.sh``` - Script to setup the virtual environment and install dependencies
 
-```env``` - Virtual environment directory
+- Helper Shell Scripts:
+    - ```setup.sh```: set up the virtual environment
+    - ```create_db.sh```: create database
+    - ```reset_db.sh```: reset/clear database
+    - ```run_tests.sh```: run tests
+- Python Files:
+    - ```main.py```: FastAPI app
+    - ```database.py```: database connection and session management
+    - ```models.py```: SQL and Pydantic models
+    - ```test_vehicles.py```: test file
 
-```requirements.txt``` - File containing the dependencies
+## API Endpoints
+- ```GET /vehicle```: Get all vehicles
+- ```POST /vehicle```: Create a new vehicle
+- ```GET /vehicle/{vin}```: Get a vehicle by vin
+- ```PUT /vehicle/{vin}```: Update a vehicle by vin
+- ```DELETE /vehicle/{vin}```: Delete a vehicle by vin
 
-```database.py``` - File containing the database connection and queries
-
-```models.py``` - File containing the database models
-
-```main.py``` - File containing the API routes
-
-```test_main.py``` - File containing the tests

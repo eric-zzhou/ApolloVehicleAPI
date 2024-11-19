@@ -16,7 +16,7 @@ def db_session():
     db.close()
 
 
-# Test for creating a vehicle
+# Creating vehicle
 def test_create_vehicle():
     response = client.post(
         "/vehicle",
@@ -38,7 +38,7 @@ def test_create_vehicle():
     assert data["mod_year"] == 2023
 
 
-# Test for creating a vehicle with invalid data (missing required fields)
+# Missing fuel_type
 def test_create_invalid_vehicle():
     response = client.post(
         "/vehicle",
@@ -53,13 +53,13 @@ def test_create_invalid_vehicle():
             # Missing fuel_type
         },
     )
-    assert response.status_code == 422
-    assert "fuel_type" in response.json()["detail"][0]["loc"]
+    assert response.status_code == 400
+    assert "fuel_type" in response.json()["errors"][0]["loc"]
 
 
-# Test for duplicate VIN
+# Duplicate VIN
 def test_create_duplicate_vehicle(db_session):
-    # Create a vehicle first
+    # Create vehicle
     db_session.add(
         Vehicle(
             vin="1HGCM82633A123457",
@@ -74,25 +74,25 @@ def test_create_duplicate_vehicle(db_session):
     )
     db_session.commit()
 
-    # Try creating a vehicle with the same VIN
+    # Creating same VIN
     response = client.post(
         "/vehicle",
         json={
-            "vin": "1HGCM82633A123457",
+            "vin": "1hGCm82633A123457",
             "manufacturer_name": "Ford",
-            "description": "Sedan",
-            "horse_power": 160,
-            "mod_name": "Fusion",
-            "mod_year": 2022,
-            "purchase_price": 25000.00,
+            "description": "Sedan #2",
+            "horse_power": 161,
+            "mod_name": "Fusion x2",
+            "mod_year": 2023,
+            "purchase_price": 30000.00,
             "fuel_type": "Gasoline",
         },
     )
-    assert response.status_code == 400
+    assert response.status_code == 422
     assert response.json()["detail"] == "Vehicle with this VIN already exists"
 
 
-# Test for retrieving a vehicle by VIN
+# Get vehicle by VIN
 def test_get_vehicle(db_session):
     db_session.add(
         Vehicle(
@@ -108,7 +108,7 @@ def test_get_vehicle(db_session):
     )
     db_session.commit()
 
-    response = client.get("/vehicle/1HGCM82633A123458")
+    response = client.get("/vehicle/1HgCm82633a123458")
     assert response.status_code == 200
     data = response.json()
     assert data["vin"] == "1HGCM82633A123458"
@@ -116,14 +116,14 @@ def test_get_vehicle(db_session):
     assert data["fuel_type"] == "Gasoline"
 
 
-# Test for vehicle not found
+# Nonexistent vehicle
 def test_get_vehicle_not_found():
-    response = client.get("/vehicle/nonexistentvin")
+    response = client.get("/vehicle/noexist")
     assert response.status_code == 400
     assert response.json()["detail"] == "Vehicle not found"
 
 
-# Test for updating an existing vehicle
+# Updating vehicle
 def test_update_vehicle(db_session):
     db_session.add(
         Vehicle(
@@ -140,7 +140,7 @@ def test_update_vehicle(db_session):
     db_session.commit()
 
     response = client.put(
-        "/vehicle/1HGCM82633A123459",
+        "/vehicle/1hgCM82633A123459",
         json={
             "vin": "1HGCM82633A123459",
             "manufacturer_name": "Chevrolet",
@@ -158,7 +158,7 @@ def test_update_vehicle(db_session):
     assert data["horse_power"] == 350
 
 
-# Test for deleting a vehicle
+# Deleting vehicle
 def test_delete_vehicle(db_session):
     db_session.add(
         Vehicle(
@@ -174,25 +174,23 @@ def test_delete_vehicle(db_session):
     )
     db_session.commit()
 
-    response = client.delete("/vehicle/1HGCM82633A123460")
+    response = client.delete("/vehicle/1hGCM82633A123460")
     assert response.status_code == 204
 
-    # Verify the vehicle was deleted
     response = client.get("/vehicle/1HGCM82633A123460")
     assert response.status_code == 400
     assert response.json()["detail"] == "Vehicle not found"
 
 
-# Test for invalid JSON format (Bad Request)
+# Invalid JSON
 def test_invalid_json():
     response = client.post("/vehicle", data="Invalid JSON")
-    print(response)
     assert response.status_code == 400
     assert "Invalid JSON format" in response.json()["detail"]
 
 
-# Test for empty required fields (unprocessable entity)
-def test_missing_required_fields():
+# Empty required fields
+def test_empty_required_fields():
     response = client.post(
         "/vehicle",
         json={
@@ -207,7 +205,7 @@ def test_missing_required_fields():
         },
     )
     assert response.status_code == 422
-    assert "manufacturer_name" in response.json()["detail"][0]["loc"]
+    assert "manufacturer_name" in response.json()["errors"][0]["loc"]
 
 
 # Test for invalid data types
@@ -226,4 +224,4 @@ def test_invalid_data_types():
         },
     )
     assert response.status_code == 422
-    assert "horse_power" in response.json()["detail"][0]["loc"]
+    assert "horse_power" in response.json()["errors"][0]["loc"]

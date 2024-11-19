@@ -13,16 +13,33 @@ Base.metadata.create_all(bind=engine)
 
 
 db_dep = Annotated[Session, Depends(get_db)]
+format_errs = {"string_type", "string_too_short", "greater_than", "int_parsing"}
 
 
 # Exception Handlers
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    print("ERRORRRRR")
-    print(exc.errors())
+async def validation_exception_handler(_: Request, exc: RequestValidationError):
+    format_err = True
+    for err in exc.errors():
+        if err["type"] not in format_errs:
+            format_err = False
+            break
+    if format_err:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "detail": "Invalid vehicle object",
+                "errors": exc.errors(),
+                "body": exc.body,
+            },
+        )
     return JSONResponse(
-        status_code=422,
-        content={"detail": exc.errors(), "body": exc.body},
+        status_code=400,
+        content={
+            "detail": "Invalid JSON format",
+            "errors": exc.errors(),
+            "body": exc.body,
+        },
     )
 
 
@@ -48,7 +65,7 @@ def post_vehicle(vehicle: models.VehicleBase, db: db_dep):
     # Ensure unique VIN
     if db.query(models.Vehicle).filter(models.Vehicle.vin == vehicle.vin).first():
         raise HTTPException(
-            status_code=400, detail="Vehicle with this VIN already exists"
+            status_code=422, detail="Vehicle with this VIN already exists"
         )
 
     new_vehicle = models.Vehicle(
